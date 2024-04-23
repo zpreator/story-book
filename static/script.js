@@ -1,11 +1,5 @@
 let currentSelection = {};
 
-function nextQuestion() {
-    // Logic to move to next question or save the current selection
-    console.log(currentSelection); // Debugging output to see selections
-    // Move to next question logic here
-}
-
 document.querySelectorAll('.option').forEach(option => {
     option.addEventListener('click', function() {
         currentSelection[this.parentElement.parentElement.id] = this.dataset.value;
@@ -15,3 +9,11 @@ document.querySelectorAll('.option').forEach(option => {
         this.classList.add('selected');
     });
 });
+
+function nextQuestion() {
+    // Add logic to switch between questions and update the sidebar history
+    console.log(currentSelection); // Placeholder for actual logic
+    let historyItem = document.createElement('li');
+    historyItem.textContent = 'Selected Genre: ' + currentSelection['genreQuestion'];
+    document.getElementById('historyList').appendChild(historyItem);
+}
