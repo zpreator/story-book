@@ -1,0 +1,22 @@
+body {
+    display: flex;
+    font-family: Arial, sans-serif;
+}
+
+.sidebar {
+    flex: 1;
+    background-color: #f4f4f4;
+    padding: 20px;
+    height: 100vh; /* Full-height */
+}
+
+.content {
+    flex: 3;
+    padding: 20px;
+}
+
+@media (max-width: 600px) {
+    .sidebar {
+        display: none; /* Hide sidebar on small screens */
+    }
+}

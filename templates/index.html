@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Application</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div id="sidebar" class="sidebar">
+        <h2>History</h2>
+        <ul id="historyList">
+            <!-- History items will be added here dynamically -->
+        </ul>
+    </div>
+    <div class="content">
+        <h1>Quiz Questions</h1>
+        <form id="quizForm">
+            <p>What is your favorite color?</p>
+            <div>
+                <input type="radio" id="colorBlue" name="favoriteColor" value="Blue">
+                <label for="colorBlue">Blue</label>
+            </div>
+            <div>
+                <input type="radio" id="colorRed" name="favoriteColor" value="Red">
+                <label for="colorRed">Red</label>
+            </div>
+            <div>
+                <input type="radio" id="colorGreen" name="favoriteColor" value="Green">
+                <label for="colorGreen">Green</label>
+            </div>
+            <p><label for="customColor">Or specify another color:</label></p>
+            <input type="text" id="customColor" name="customColor">
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>
