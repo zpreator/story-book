@@ -1,14 +1,17 @@
-document.getElementById('quizForm').addEventListener('submit', function(event) {
-    event.preventDefault();
+let currentSelection = {};
 
-    let historyList = document.getElementById('historyList');
-    let favoriteColor = document.querySelector('input[name="favoriteColor"]:checked')?.value;
-    let customColor = document.getElementById('customColor').value;
+function nextQuestion() {
+    // Logic to move to next question or save the current selection
+    console.log(currentSelection); // Debugging output to see selections
+    // Move to next question logic here
+}
 
-    let text = 'Favorite Color: ' + (favoriteColor || customColor || 'None specified');
-    let newItem = document.createElement('li');
-    newItem.textContent = text;
-    historyList.appendChild(newItem);
-
-    document.getElementById('customColor').value = ''; // Reset custom color input
+document.querySelectorAll('.option').forEach(option => {
+    option.addEventListener('click', function() {
+        currentSelection[this.parentElement.parentElement.id] = this.dataset.value;
+        this.parentElement.querySelectorAll('.option').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        this.classList.add('selected');
+    });
 });
