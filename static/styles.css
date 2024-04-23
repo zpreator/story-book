@@ -12,12 +12,11 @@ body {
 
 .content {
     flex: 1;
-    margin: 0 20px;
+    text-align: center;
     padding: 20px;
-}
-
-.question {
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .options {
@@ -26,26 +25,45 @@ body {
 }
 
 .option {
-    border: 1px solid #ccc;
-    border-radius: 10px; /* Rounded corners for modern look */
+    border: 2px solid transparent; /* Change border color when selected */
+    border-radius: 10px;
     padding: 10px;
     text-align: center;
     width: 150px;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: all 0.3s ease-in-out;
     margin: 10px;
+    background-color: #fff; /* Default background color */
+}
+
+.option.selected {
+    border-color: #007BFF; /* Blue border for selected items */
+    background-color: #E7F3FF; /* Light blue background for a soft highlight */
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5); /* Soft glow effect */
+}
+
+.option img {
+    width: 100%;
+    height: 100px;
+    border-radius: 8px;
+    object-fit: cover;
 }
 
 .option:hover {
     transform: scale(1.05); /* Slight scale on hover for interactivity */
 }
 
-.option img {
-    width: 100%;
-    height: 100px;
-    border-radius: 8px; /* Rounded corners for images too */
-    object-fit: cover;
+.start-over {
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #ff4d4d; /* Red color for clear visibility */
+    color: white;
+    border: none;
+    border-radius: 5px;
 }
+
 
 button {
     padding: 10px 20px;
@@ -72,4 +90,12 @@ button {
     .option {
         margin-bottom: 10px;
     }
+}
+
+.question {
+    display: none; /* Hide all questions by default */
+}
+
+.question.active {
+    display: block; /* Only show the active question */
 }
