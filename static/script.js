@@ -1,15 +1,23 @@
 let currentIndex = 0;
 let currentSelection = {};
 const questions = document.querySelectorAll('.question');
+const nextButton = document.getElementById('nextButton');
+const submitButton = document.getElementById('submitButton');
 
 function showQuestion(index) {
-    questions.forEach((question, idx) => {
-        if (idx === index) {
-            question.classList.add('active');
-        } else {
-            question.classList.remove('active');
-        }
+    questions.forEach(question => {
+        question.classList.remove('active');
     });
+    questions[index].classList.add('active');
+
+    // Handle button visibility
+    if (currentIndex === questions.length - 1) {
+        nextButton.style.display = 'none';
+        submitButton.style.display = 'inline-block';
+    } else {
+        nextButton.style.display = 'inline-block';
+        submitButton.style.display = 'none';
+    }
 }
 
 function startOver() {
@@ -55,6 +63,33 @@ function prevQuestion() {
         currentIndex--;
         showQuestion(currentIndex);
     }
+}
+
+function submitForm() {
+    // Collect data to send
+    const formData = {};
+    questions.forEach(question => {
+        let selected = question.querySelector('.option.selected');
+        if (selected) {
+            formData[question.id] = selected.getAttribute('data-value');
+        }
+    });
+
+    // Send data to Flask route
+    fetch('/submit', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
 }
 
 function updateHistory() {
