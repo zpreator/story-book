@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Children's Book Viewer</title>
+    <style>
+        body, html {
+            padding: 0;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+        }
+        .page {
+            margin: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            width: 45%;
+        }
+        .page img {
+            width: 100%;
+            height: auto;
+        }
+        .text {
+            padding: 15px;
+            text-align: center;
+        }
+        .navigation {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .arrow {
+            cursor: pointer;
+            font-size: 24px;
+            margin: 0 20px;
+            user-select: none;
+        }
+        @media (max-width: 768px) {
+            .page {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="bookContainer"></div>
+    <div class="navigation">
+        <span class="arrow" onclick="navigate(-1)">&#10094;</span>
+        <span class="arrow" onclick="navigate(1)">&#10095;</span>
+    </div>
+    <script>
+        const pages = {{ pages | tojson }};
+        let currentIndex = 0;
+
+        function renderPages() {
+            const container = document.getElementById('bookContainer');
+            container.innerHTML = ''; // Clear existing content
+            const startIndex = currentIndex * 2; // Show two pages at a time
+            const endIndex = startIndex + 2;
+
+            for (let i = startIndex; i < endIndex && i < pages.length; i++) {
+                const page = pages[i];
+                const pageElement = document.createElement('div');
+                pageElement.className = 'page';
+                pageElement.innerHTML = `<img src="${page.image}" alt="Page Image"><div class="text">${page.text}</div>`;
+                container.appendChild(pageElement);
+            }
+        }
+
+        function navigate(direction) {
+            currentIndex += direction;
+            if (currentIndex < 0) {
+                currentIndex = 0; // Prevent going before the first page
+            } else if (currentIndex > Math.ceil(pages.length / 2) - 1) {
+                currentIndex = Math.ceil(pages.length / 2) - 1; // Prevent going past the last page
+            }
+            renderPages();
+        }
+
+        window.onload = renderPages;
+    </script>
+</body>
+</html>

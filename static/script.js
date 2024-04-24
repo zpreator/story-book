@@ -3,6 +3,7 @@ let currentSelection = {};
 const questions = document.querySelectorAll('.question');
 const nextButton = document.getElementById('nextButton');
 const submitButton = document.getElementById('submitButton');
+const historyList = document.getElementById('historyList');
 
 function showQuestion(index) {
     questions.forEach(question => {
@@ -66,7 +67,6 @@ function prevQuestion() {
 }
 
 function submitForm() {
-    // Collect data to send
     const formData = {};
     questions.forEach(question => {
         let selected = question.querySelector('.option.selected');
@@ -75,7 +75,6 @@ function submitForm() {
         }
     });
 
-    // Send data to Flask route
     fetch('/submit', {
         method: 'POST',
         headers: {
@@ -85,18 +84,33 @@ function submitForm() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Success:', data);
+        if (data.status === 'success') {
+            window.location.href = data.redirect_url; // Redirect to the new URL
+        } else {
+            console.error('Error:', data.message);
+        }
     })
     .catch((error) => {
         console.error('Error:', error);
     });
 }
 
-function updateHistory() {
-    let historyItem = document.createElement('li');
-    historyItem.textContent = 'Selected: ' + currentSelection[questions[currentIndex - 1].id];
-    document.getElementById('historyList').appendChild(historyItem);
-}
 
+function updateHistory() {
+    const currentQuestion = questions[currentIndex - 1];
+    const value = currentQuestion.getAttribute('data-value') + ": " + currentSelection[questions[currentIndex - 1].id];
+
+    // Check if there's already an entry for this question
+    let existingEntry = historyList.querySelector(`li[data-question-id="${currentQuestion.id}"]`);
+    if (existingEntry) {
+        existingEntry.textContent = value; // Update existing entry
+    } else {
+        // Create new entry if not already there
+        let historyItem = document.createElement('li');
+        historyItem.setAttribute('data-question-id', currentQuestion.id); // Set an attribute to identify the question
+        historyItem.textContent = value;
+        historyList.appendChild(historyItem);
+    }
+}
 // Initialize the first question
 showQuestion(0);

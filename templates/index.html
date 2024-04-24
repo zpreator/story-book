@@ -15,7 +15,7 @@
     </div>
     <div class="content">
         <button type="button" onclick="startOver()" class="start-over">Start Over</button>
-        <div class="question active" id="genreQuestion">
+        <div class="question active" id="genreQuestion" data-value="Genre">
             <h2>Select a Genre</h2>
             <div class="options">
                 <div class="option" data-value="Fantasy"><img src="/static/images/fantasy.jpg"><span>Fantasy</span></div>
@@ -26,7 +26,7 @@
                 <div class="option" data-value="Western"><img src="/static/images/western.jpg"><span>Western</span></div>
             </div>
         </div>
-        <div class="question" id="settingQuestion">
+        <div class="question" id="settingQuestion" data-value="Setting">
             <h2>Choose the Setting</h2>
             <div class="options">
                 <div class="option" data-value="Magical Kingdom"><span>A magical kingdom</span></div>
@@ -37,7 +37,7 @@
                 <div class="option" data-value="Mysterious Island"><span>A mysterious island</span></div>
             </div>
         </div>
-        <div class="question" id="mainCharacterQuestion">
+        <div class="question" id="mainCharacterQuestion" data-value="Main Character">
             <h2>Determine the Main Character</h2>
             <div class="options">
                 <div class="option" data-value="Brave Knight"><span>A brave knight</span></div>
@@ -48,7 +48,7 @@
                 <div class="option" data-value="Resourceful Inventor"><span>A resourceful inventor</span></div>
             </div>
         </div>
-        <div class="question" id="mainConflictQuestion">
+        <div class="question" id="mainConflictQuestion" data-value="Main Conflict">
             <h2>Select the Main Conflict</h2>
             <div class="options">
                 <div class="option" data-value="Lost Treasure"><span>Finding a lost treasure</span></div>
@@ -59,7 +59,7 @@
                 <div class="option" data-value="Make Friend"><span>Making a new friend</span></div>
             </div>
         </div>
-        <div class="question" id="storyToneQuestion">
+        <div class="question" id="storyToneQuestion" data-value="Tone">
             <h2>Decide on the Tone of the Story</h2>
             <div class="options">
                 <div class="option" data-value="Exciting"><span>Exciting and fast-paced</span></div>
@@ -70,7 +70,7 @@
                 <div class="option" data-value="Sweet"><span>Sweet and heartwarming</span></div>
             </div>
         </div>
-        <div class="question" id="storyEndingQuestion">
+        <div class="question" id="storyEndingQuestion" data-value="Ending">
             <h2>Pick an Ending</h2>
             <div class="options">
                 <div class="option" data-value="Lesson Learned"><span>With a lesson learned</span></div>
@@ -81,6 +81,7 @@
                 <div class="option" data-value="Happily Ever After"><span>With everyone living happily ever after</span></div>
             </div>
         </div>
+        <br>
         <div class="navigation">
             <button type="button" onclick="prevQuestion()">Back</button>
             <button type="button" onclick="nextQuestion()" id="nextButton">Next</button>

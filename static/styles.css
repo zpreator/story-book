@@ -23,20 +23,23 @@ body {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 20px;
 }
 
 .option {
-    flex: 1 1 180px; /* Allows each option to grow and shrink but bases the initial size on 180px */
-    margin: 5px;
-    border: 2px solid transparent; /* Change border color when selected */
-    border-radius: 10px;
+    width: 180px;            /* Fixed width for each option */
+    height: 180;           /* Fixed height for each option */
+    border: 2px solid transparent;  /* Styling for border */
+    border-radius: 10px;     /* Rounded corners for aesthetics */
     padding: 10px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
-    background-color: #fff; /* Default background color */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* subtle shadow for depth */
+    background-color: #fff;  /* Default background color */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distributes space around children */
 }
 
 .option.selected {
@@ -101,4 +104,19 @@ button {
 
 .question.active {
     display: block; /* Only show the active question */
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.story-content {
+    text-align: left;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
 }
