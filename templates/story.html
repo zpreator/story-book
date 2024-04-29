@@ -29,6 +29,20 @@
         .text {
             padding: 15px;
             text-align: center;
+            flex-grow: 1;
+        }
+        .play-button {
+            width: 40px; /* Width of the button */
+            height: 40px; /* Height of the button */
+            border-radius: 50%; /* Makes the button circular */
+            border: none; /* Removes the border */
+            background-color: #007BFF; /* Background color */
+            color: white; /* Text color */
+            display: flex;
+            align-items: center; /* Centers the play icon vertically */
+            justify-content: center; /* Centers the play icon horizontally */
+            cursor: pointer; /* Changes cursor to pointer on hover */
+            outline: none; /* Removes outline */
         }
         .navigation {
             text-align: center;
@@ -60,26 +74,49 @@
         function renderPages() {
             const container = document.getElementById('bookContainer');
             container.innerHTML = ''; // Clear existing content
-            const startIndex = currentIndex * 2; // Show two pages at a time
-            const endIndex = startIndex + 2;
+            const startIndex = currentIndex; // Show two pages at a time
+            const endIndex = startIndex + 1;
 
             for (let i = startIndex; i < endIndex && i < pages.length; i++) {
                 const page = pages[i];
                 const pageElement = document.createElement('div');
                 pageElement.className = 'page';
-                pageElement.innerHTML = `<img src="${page.image}" alt="Page Image"><div class="text">${page.text}</div>`;
+                pageElement.innerHTML = `
+                    <img src="${page.image}" alt="${page.description}">
+                    <div class="text" id="textInput">${page.text}</div>
+                    <audio id="audioPlayer" style="text-align:center;" controls hidden></audio>`;
+                pageElement.style.textAlign = "center";
                 container.appendChild(pageElement);
             }
+            convertTextToSpeech();
         }
 
         function navigate(direction) {
             currentIndex += direction;
             if (currentIndex < 0) {
                 currentIndex = 0; // Prevent going before the first page
-            } else if (currentIndex > Math.ceil(pages.length / 2) - 1) {
-                currentIndex = Math.ceil(pages.length / 2) - 1; // Prevent going past the last page
+            } else if (currentIndex > pages.length - 1) {
+                currentIndex = pages.length - 1; // Prevent going past the last page
             }
             renderPages();
+        }
+
+        function convertTextToSpeech() {
+            const text = document.getElementById('textInput').innerText;
+            const formData = new FormData();
+            formData.append('text', text);
+
+            fetch('/tts', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.blob())
+              .then(blob => {
+                  const url = URL.createObjectURL(blob);
+                  const audioPlayer = document.getElementById('audioPlayer');
+                  audioPlayer.src = url;
+                  audioPlayer.hidden = false;
+                  audioPlayer.play();
+              }).catch(error => console.error('Error:', error));
         }
 
         window.onload = renderPages;

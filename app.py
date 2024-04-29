@@ -1,8 +1,16 @@
-from flask import Flask, render_template, request, url_for, jsonify, session
+from flask import Flask, render_template, request, url_for, jsonify, session, send_file
 import os
+import openai
 from openai import OpenAI
 from dotenv import load_dotenv
 import re
+import time
+from pathlib import Path
+from tqdm import tqdm
+from moviepy.editor import ImageClip, concatenate_videoclips, AudioFileClip
+import requests
+from PIL import Image
+from io import BytesIO
 
 load_dotenv()
 
@@ -44,20 +52,88 @@ def handle_data():
 def display_story():
     story = session.get('story', 'No story found')
 
+    print(story)
+    
     # Parse the story and ask dalle for images
     results = extract_text_with_brackets(story)
     pages = []
-    for description, text in results:
-        response = client.images.generate(
-            model="dall-e-3",
-            prompt=description,
-            size="1024x1024",
-            quality="standard",
-            n=1,
-        )
-        image_url = response.data[0].url
-        pages.append({"image": image_url, "text": text})
+    count = 0
+    image_paths = []
+    audio_paths = []
+    for description, text in tqdm(results):
+        try:
+            response = client.images.generate(
+                model="dall-e-3",
+                prompt=description,
+                size="1024x1024",
+                quality="standard",
+                n=1,
+            )
+            image_url = response.data[0].url
+            pages.append({"image": image_url, "text": text, "description": description})
+        except openai.RateLimitError:
+            time.sleep(60)
+            response = client.images.generate(
+                model="dall-e-2",
+                prompt=description,
+                size="1024x1024",
+                quality="standard",
+                n=1,
+            )
+            image_url = response.data[0].url
+            pages.append({"image": image_url, "text": text, "description": description})
+        image_path = f"image{count}.png"
+        audio_path = f"audio{count}.mp3"
+        save_text_to_speech(text, audio_path)
+        response = requests.get(image_url)
+        image = Image.open(BytesIO(response.content))
+        image.save(image_path)
+        count += 1
+        image_paths.append(image_path)
+        audio_paths.append(audio_path)
+
+    make_video(image_paths, audio_paths, "temp.mp4")
     return render_template('story.html', pages=pages)
+
+@app.route('/tts', methods=['POST'])
+def text_to_speech():
+    # Get text from POST request
+    text = request.form['text']
+    
+    # Specify the path for the speech file
+    save_file = "speech.mp3"
+
+    save_text_to_speech(text, save_file)
+    
+    # Return the speech file
+    return send_file(str(save_file), as_attachment=True)
+
+def save_text_to_speech(text, save_path):
+    # Call OpenAI's text-to-speech API
+    response = client.audio.speech.create(
+        model="tts-1",
+        voice="alloy",
+        input=text
+    )
+    
+    # Stream the response to a file
+    response.stream_to_file(str(save_path))
+
+def make_video(image_files, audio_files, save_path):
+   clips = []
+   # Iterate through the image and audio files and create pairs of clips
+   for image_path, audio_path in zip(image_files, audio_files):
+      audio_clip = AudioFileClip(audio_path)
+      # Load image clip
+      image_clip = ImageClip(image_path).set_duration(audio_clip.duration)
+
+      clips.append(image_clip.set_audio(audio_clip))
+
+   # Concatenate the final clips
+   final_video = concatenate_videoclips(clips)
+
+   # Export the final video
+   final_video.write_videofile(save_path, codec='libx264', fps=24)
 
 def extract_text_with_brackets(text):
     # Use a regular expression to find all bracketed sections and the following paragraphs
@@ -85,15 +161,35 @@ def construct_prompt(data):
     \nTone: {data.get('storyToneQuestion')}
     \nEnding: {data.get('storyEndingQuestion')}
     \n
-    \nPlease divide the story into hypothetical pages, where each page
-    \nis only one to two sentences. For each page, also include a section
-    \npreceding it describing the hypothetical image on that page and wrap that
-    \ntext in square brackets. Make sure each page has a visual description, and text.
+    \nPlease divide the story into pages, where each page contains a description of the
+    \nimage for that page of the story book, as well as the text for the story. The description 
+    \nof the image should be in square brackets and should only talk about the scene. Leave the regular
+    \nstory component as text. For the text on each page, keep it to only 1 - 2 sentences.
+    \nThere is no need to specify page numbers, and make sure each page has part of the story, and a
+    \ndescription of the image.
+    \n
+    \nIn your description of the image, don't use the names of the characters, instead describe
+    \nthem with great detail everytime. Make sure the details stay the same in different sections.
     \n
     \nKeep the language easy to read for kids of ages 10 and up, but keep the content
     \nentertaining for both the kids and adults.
     \n
-    \nOnly generate a maximum of 6 pages for the short story."""
+    \nWrite a title first, then only generate a maximum of 6 pages for the short story. Make sure each page
+    \nhas an associated visual description in square brackets and text from the story.
+    \n
+    \nHere is a short example of 2 pages:
+    \n
+    \nThe Observing Turtle
+    \n
+    \n[A picture of an observatory overlooking a city with the stars showing, a turtle is seen looking through a telescope]
+    \n
+    \nOnce upon a time, in an observatory, there lived a turtle that liked looking at the stars. He always
+    \nspent his time with his favorite telescope.
+    \n
+    \n[A picture of a shooting star over a turtle with a telescope]
+    \n
+    \nOne day, the turtle observed a shooting star. He decided to make a wish.
+    """
     return prompt
 
 if __name__ == '__main__':
