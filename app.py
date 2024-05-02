@@ -14,7 +14,7 @@ from io import BytesIO
 
 load_dotenv()
 
-DEBUG = os.getenv("DEBUG", True)
+DEBUG = "True" == os.getenv("DEBUG", "True")
 STATIC = os.path.join(os.path.split(__file__)[0], "static")
 
 client = OpenAI(api_key=os.getenv('OPENAI_KEY'))
