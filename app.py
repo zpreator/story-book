@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, jsonify, session, send_file
+from flask import Flask, render_template, request, url_for, jsonify, session, send_file, Response
 import os
 import openai
 from openai import OpenAI
@@ -13,6 +13,9 @@ from PIL import Image
 from io import BytesIO
 
 load_dotenv()
+
+DEBUG = True
+STATIC = os.path.join(os.path.split(__file__)[0], "static")
 
 client = OpenAI(api_key=os.getenv('OPENAI_KEY'))
 
@@ -33,27 +36,58 @@ def handle_data():
 
     system_msg = 'You are an assistant that writes childrens story books'
 
-    # Create a dataset using GPT
-    response = client.chat.completions.create(model="gpt-3.5-turbo",
-                                            messages=[{"role": "system", "content": system_msg},
-                                            {"role": "user", "content": prompt_text}])
+    if DEBUG:
+        output = """
+The Resourceful Inventor on the Mysterious Island
 
-    # Check if the API call was successful
-    if response.choices[0].finish_reason == "stop":
-        output = response.choices[0].message.content
-        # print(output)
+[A picture of a lush, green island with colorful flowers and a hidden cave entrance]
+
+In a faraway, mysterious island, there lived a clever inventor who loved creating new gadgets. One day, he stumbled upon a hidden cave, sparking his curiosity.
+
+[A picture of the inventor exploring the dark cave with a flashlight]
+
+As the inventor ventured into the dark cave with his trusty flashlight, he discovered peculiar markings on the walls. It was a mystery waiting to be solved!
+
+[A picture of the inventor examining ancient artifacts found in the cave]
+
+Among the ancient artifacts inside the cave, the inventor found a map leading to a hidden treasure. Excited and determined, he knew he had to embark on an adventure.
+
+[A picture of the inventor navigating through a dense jungle with his makeshift compass]
+
+Equipped with his inventive compass made from sticks and leaves, the resourceful inventor bravely journeyed through the dense jungle, following the map's clues.
+
+[A picture of the inventor uncovering a hidden treasure chest filled with glowing gems]
+
+After many challenges and obstacles, the inventor finally reached the treasure chest hidden deep within the heart of the island. Inside, he found shimmering gems and a note that read, "The greatest treasure is not gold, but the journey itself."
+
+[A picture of the inventor sailing back home on a boat, with a smile on his face]
+
+With a heart full of joy and wisdom gained from his adventure, the inventor sailed back home, knowing that true treasures are found in the experiences we live and the lessons we learn.
+"""
         session['story'] = output
-        return jsonify({'status': 'success', 'redirect_url': url_for('display_story')})
+        return jsonify({'status': 'success'})
     else:
-        print("Something went wrong")
-        return jsonify({'status': 'error', 'message': 'Failed to process data with AI'})
+        # Create a dataset using GPT
+        response = client.chat.completions.create(model="gpt-3.5-turbo",
+                                                messages=[{"role": "system", "content": system_msg},
+                                                {"role": "user", "content": prompt_text}])
 
-@app.route('/story')
+        # Check if the API call was successful
+        if response.choices[0].finish_reason == "stop":
+            output = response.choices[0].message.content
+            
+            session['story'] = output
+            return jsonify({'status': 'success'})
+        else:
+            print("Something went wrong")
+            return jsonify({'status': 'error', 'message': 'Failed to process data with AI'})
+
+@app.route('/story', methods=['POST'])
 def display_story():
     story = session.get('story', 'No story found')
 
     print(story)
-    
+
     # Parse the story and ask dalle for images
     results = extract_text_with_brackets(story)
     pages = []
@@ -61,39 +95,44 @@ def display_story():
     image_paths = []
     audio_paths = []
     for description, text in tqdm(results):
-        try:
-            response = client.images.generate(
-                model="dall-e-3",
-                prompt=description,
-                size="1024x1024",
-                quality="standard",
-                n=1,
-            )
-            image_url = response.data[0].url
-            pages.append({"image": image_url, "text": text, "description": description})
-        except openai.RateLimitError:
-            time.sleep(60)
-            response = client.images.generate(
-                model="dall-e-2",
-                prompt=description,
-                size="1024x1024",
-                quality="standard",
-                n=1,
-            )
-            image_url = response.data[0].url
-            pages.append({"image": image_url, "text": text, "description": description})
-        image_path = f"image{count}.png"
-        audio_path = f"audio{count}.mp3"
-        save_text_to_speech(text, audio_path)
-        response = requests.get(image_url)
-        image = Image.open(BytesIO(response.content))
-        image.save(image_path)
+        if DEBUG:
+            pages.append({"image": url_for('static', filename=f"test/image{count}.png"), "text": text, "description": description})
+        else:
+            try:
+                response = client.images.generate(
+                    model="dall-e-3",
+                    prompt=description,
+                    size="1024x1024",
+                    quality="standard",
+                    n=1,
+                )
+                image_url = response.data[0].url
+                pages.append({"image": image_url, "text": text, "description": description})
+            except openai.RateLimitError:
+                time.sleep(60)
+                response = client.images.generate(
+                    model="dall-e-2",
+                    prompt=description,
+                    size="1024x1024",
+                    quality="standard",
+                    n=1,
+                )
+                image_url = response.data[0].url
+                pages.append({"image": image_url, "text": text, "description": description})
         count += 1
-        image_paths.append(image_path)
-        audio_paths.append(audio_path)
+            # image_path = f"image{count}.png"
+            # audio_path = f"audio{count}.mp3"
+            # save_text_to_speech(text, audio_path)
+            # response = requests.get(image_url)
+            # image = Image.open(BytesIO(response.content))
+            # image.save(image_path)
+            
+            # image_paths.append(image_path)
+            # audio_paths.append(audio_path)
 
-    make_video(image_paths, audio_paths, "temp.mp4")
-    return render_template('story.html', pages=pages)
+    # make_video(image_paths, audio_paths, "temp.mp4")
+    session["pages"] = pages
+    return jsonify({'status': 'success', 'pages': pages})
 
 @app.route('/tts', methods=['POST'])
 def text_to_speech():
@@ -103,10 +142,38 @@ def text_to_speech():
     # Specify the path for the speech file
     save_file = "speech.mp3"
 
-    save_text_to_speech(text, save_file)
+    if not DEBUG:
+        save_text_to_speech(text, save_file)
     
     # Return the speech file
     return send_file(str(save_file), as_attachment=True)
+
+@app.route("/export")
+def export():
+    pages = session.get('pages')
+    if pages:
+        image_paths = []
+        audio_paths = []
+        for i, page in enumerate(pages):
+            image_path = f"image{i}.png"
+            audio_path = f"audio{i}.mp3"
+            save_text_to_speech(page["text"], audio_path)
+            if "http" in page["image"]:
+                response = requests.get(page["image"])
+                image = Image.open(BytesIO(response.content))
+            else:
+                image = Image.open(os.path.join(STATIC, "test", page["image"].split("/")[-1]))
+            image.save(image_path)
+            
+            image_paths.append(image_path)
+            audio_paths.append(audio_path)
+        make_video(image_paths, audio_paths, "video.mp4")
+        return send_file("video.mp4", as_attachment=True)
+    return '', 204
+
+@app.route("/support")
+def support():
+    return render_template('support.html')
 
 def save_text_to_speech(text, save_path):
     # Call OpenAI's text-to-speech API
@@ -193,4 +260,4 @@ def construct_prompt(data):
     return prompt
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001, host='0.0.0.0')

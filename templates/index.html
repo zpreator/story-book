@@ -1,93 +1,128 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Your Storybook</title>
-    <link rel="stylesheet" href="/static/styles.css">
-</head>
-<body>
+{% extends 'layout.html' %}
+
+{% block body %}
+<div>
     <div id="sidebar" class="sidebar">
-        <h2>History</h2>
+        <h2>Selections</h2>
         <ul id="historyList">
             <!-- History items will be added here dynamically -->
         </ul>
-    </div>
+        <h2>Chapters</h2>
+        <ul id="chapters" style="display: none;">
+            <!-- Chapter items will be added here dynamically -->
+        </ul>
+    </div> 
     <div class="content">
-        <button type="button" onclick="startOver()" class="start-over">Start Over</button>
-        <div class="question active" id="genreQuestion" data-value="Genre">
-            <h2>Select a Genre</h2>
-            <div class="options">
-                <div class="option" data-value="Fantasy"><img src="/static/images/fantasy.jpg"><span>Fantasy</span></div>
-                <div class="option" data-value="Science Fiction"><img src="/static/images/scifi.jpg"><span>Science Fiction</span></div>
-                <div class="option" data-value="Adventure"><img src="/static/images/adventure.jpg"><span>Adventure</span></div>
-                <div class="option" data-value="Mystery"><img src="/static/images/mystery.jpg"><span>Mystery</span></div>
-                <div class="option" data-value="Fairy Tale"><img src="/static/images/fairytale.jpg"><span>Fairy Tale</span></div>
-                <div class="option" data-value="Western"><img src="/static/images/western.jpg"><span>Western</span></div>
+        <div id="questions">
+            <div id="questionsButtons">
+                <button type="button" id="startOver" onclick="startOver()" class="start-over">Start Over</button>
+            </div>
+            <div id="loading">
+                <div id="spinner1" style="display: none;">
+                    <div class="spinner" ></div>
+                    <h2>Generating Story...</h2>
+                </div>
+                <div id="storyComplete" style="display: none;"><h2>Story Complete</h2></div>
+                <div id="spinner2" style="display: none;">
+                    <div class="spinner"></div>
+                    <h2>Generating Images...</h2>
+                </div>
+                <div id="imagesComplete" style="display: none;"><h2>Images Complete</h2></div>
+            </div>
+            <div class="question active" id="genreQuestion" data-value="Genre">
+                <h2>Select a Genre</h2>
+                <div class="options">
+                    <div class="option" data-value="Fantasy"><img src="/static/images/fantasy.jpg"><span>Fantasy</span></div>
+                    <div class="option" data-value="Science Fiction"><img src="/static/images/scifi.jpg"><span>Science Fiction</span></div>
+                    <div class="option" data-value="Adventure"><img src="/static/images/adventure.jpg"><span>Adventure</span></div>
+                    <div class="option" data-value="Mystery"><img src="/static/images/mystery.jpg"><span>Mystery</span></div>
+                    <div class="option" data-value="Fairy Tale"><img src="/static/images/fairytale.jpg"><span>Fairy Tale</span></div>
+                    <div class="option" data-value="Western"><img src="/static/images/western.jpg"><span>Western</span></div>
+                </div>
+            </div>
+            <div class="question" id="settingQuestion" data-value="Setting">
+                <h2>Choose the Setting</h2>
+                <div class="options">
+                    <div class="option" data-value="Magical Kingdom"><span>A magical kingdom</span></div>
+                    <div class="option" data-value="Outer Space"><span>Outer space</span></div>
+                    <div class="option" data-value="Bustling City"><span>A bustling city</span></div>
+                    <div class="option" data-value="Quiet Village"><span>A quiet village</span></div>
+                    <div class="option" data-value="Enchanted Forest"><span>An enchanted forest</span></div>
+                    <div class="option" data-value="Mysterious Island"><span>A mysterious island</span></div>
+                </div>
+            </div>
+            <div class="question" id="mainCharacterQuestion" data-value="Main Character">
+                <h2>Determine the Main Character</h2>
+                <div class="options">
+                    <div class="option" data-value="Brave Knight"><span>A brave knight</span></div>
+                    <div class="option" data-value="Clever Scientist"><span>A clever scientist</span></div>
+                    <div class="option" data-value="Curious Child"><span>A curious child</span></div>
+                    <div class="option" data-value="Talking Animal"><span>A talking animal</span></div>
+                    <div class="option" data-value="Royal Prince/Princess"><span>A royal prince/princess</span></div>
+                    <div class="option" data-value="Resourceful Inventor"><span>A resourceful inventor</span></div>
+                </div>
+            </div>
+            <div class="question" id="mainConflictQuestion" data-value="Main Conflict">
+                <h2>Select the Main Conflict</h2>
+                <div class="options">
+                    <div class="option" data-value="Lost Treasure"><span>Finding a lost treasure</span></div>
+                    <div class="option" data-value="Save the World"><span>Saving the world from a villain</span></div>
+                    <div class="option" data-value="Solve Mystery"><span>Solving a mystery</span></div>
+                    <div class="option" data-value="Win Competition"><span>Winning a competition</span></div>
+                    <div class="option" data-value="Overcome Fear"><span>Overcoming a fear</span></div>
+                    <div class="option" data-value="Make Friend"><span>Making a new friend</span></div>
+                </div>
+            </div>
+            <div class="question" id="storyToneQuestion" data-value="Tone">
+                <h2>Decide on the Tone of the Story</h2>
+                <div class="options">
+                    <div class="option" data-value="Exciting"><span>Exciting and fast-paced</span></div>
+                    <div class="option" data-value="Humorous"><span>Humorous and light-hearted</span></div>
+                    <div class="option" data-value="Scary"><span>Scary and thrilling</span></div>
+                    <div class="option" data-value="Inspirational"><span>Inspirational and uplifting</span></div>
+                    <div class="option" data-value="Educational"><span>Educational and informative</span></div>
+                    <div class="option" data-value="Sweet"><span>Sweet and heartwarming</span></div>
+                </div>
+            </div>
+            <div class="question" id="storyEndingQuestion" data-value="Ending">
+                <h2>Pick an Ending</h2>
+                <div class="options">
+                    <div class="option" data-value="Lesson Learned"><span>With a lesson learned</span></div>
+                    <div class="option" data-value="Twist"><span>With a twist</span></div>
+                    <div class="option" data-value="Moral Message"><span>With a moral message</span></div>
+                    <div class="option" data-value="Celebration"><span>With a celebration</span></div>
+                    <div class="option" data-value="Cliffhanger"><span>With a cliffhanger for a sequel</span></div>
+                    <div class="option" data-value="Happily Ever After"><span>With everyone living happily ever after</span></div>
+                </div>
+            </div>
+            <div class="question" id="summaryQuestion">
+                <h2>Summary</h2>
+                <div class="options" id="summary">
+                </div>
+            </div>
+            <div class="navigation" id="navigation">
+                <button type="button" onclick="prevQuestion()" id="backButton">Back</button>
+                <button type="button" onclick="nextQuestion()" id="nextButton">Next</button>
+                <button type="button" onclick="submitForm()" style="display: none;" id="submitButton">Submit</button>
             </div>
         </div>
-        <div class="question" id="settingQuestion" data-value="Setting">
-            <h2>Choose the Setting</h2>
-            <div class="options">
-                <div class="option" data-value="Magical Kingdom"><span>A magical kingdom</span></div>
-                <div class="option" data-value="Outer Space"><span>Outer space</span></div>
-                <div class="option" data-value="Bustling City"><span>A bustling city</span></div>
-                <div class="option" data-value="Quiet Village"><span>A quiet village</span></div>
-                <div class="option" data-value="Enchanted Forest"><span>An enchanted forest</span></div>
-                <div class="option" data-value="Mysterious Island"><span>A mysterious island</span></div>
+        <div id="pages" style="display: none">
+            <div id="pageButtons">
+                <button type="button" id="newStory" onclick="startOver()" class="start-over">New Story</button>
+                <button type="button" id="export" onclick="exportVideo()" class="start-over">Export as Video</button>
             </div>
-        </div>
-        <div class="question" id="mainCharacterQuestion" data-value="Main Character">
-            <h2>Determine the Main Character</h2>
-            <div class="options">
-                <div class="option" data-value="Brave Knight"><span>A brave knight</span></div>
-                <div class="option" data-value="Clever Scientist"><span>A clever scientist</span></div>
-                <div class="option" data-value="Curious Child"><span>A curious child</span></div>
-                <div class="option" data-value="Talking Animal"><span>A talking animal</span></div>
-                <div class="option" data-value="Royal Prince/Princess"><span>A royal prince/princess</span></div>
-                <div class="option" data-value="Resourceful Inventor"><span>A resourceful inventor</span></div>
+            <div id="spinner3" style="display: none;">
+                <div class="spinner"></div>
+                <h2>Exporting Video...</h2>
             </div>
-        </div>
-        <div class="question" id="mainConflictQuestion" data-value="Main Conflict">
-            <h2>Select the Main Conflict</h2>
-            <div class="options">
-                <div class="option" data-value="Lost Treasure"><span>Finding a lost treasure</span></div>
-                <div class="option" data-value="Save the World"><span>Saving the world from a villain</span></div>
-                <div class="option" data-value="Solve Mystery"><span>Solving a mystery</span></div>
-                <div class="option" data-value="Win Competition"><span>Winning a competition</span></div>
-                <div class="option" data-value="Overcome Fear"><span>Overcoming a fear</span></div>
-                <div class="option" data-value="Make Friend"><span>Making a new friend</span></div>
+            <div id="imagesComplete" style="display: none;"><h2>Images Complete</h2></div>
+            <div class="bookContainer" id="bookContainer"></div>
+            <div class="pageNavigation" id="pageNavigation">
+                <button type="button" id="backPageButton" onclick="navigate(-1)">Back</button>
+                <button type="button" id="nextPageButton" onclick="navigate(1)">Next</button>
             </div>
-        </div>
-        <div class="question" id="storyToneQuestion" data-value="Tone">
-            <h2>Decide on the Tone of the Story</h2>
-            <div class="options">
-                <div class="option" data-value="Exciting"><span>Exciting and fast-paced</span></div>
-                <div class="option" data-value="Humorous"><span>Humorous and light-hearted</span></div>
-                <div class="option" data-value="Scary"><span>Scary and thrilling</span></div>
-                <div class="option" data-value="Inspirational"><span>Inspirational and uplifting</span></div>
-                <div class="option" data-value="Educational"><span>Educational and informative</span></div>
-                <div class="option" data-value="Sweet"><span>Sweet and heartwarming</span></div>
-            </div>
-        </div>
-        <div class="question" id="storyEndingQuestion" data-value="Ending">
-            <h2>Pick an Ending</h2>
-            <div class="options">
-                <div class="option" data-value="Lesson Learned"><span>With a lesson learned</span></div>
-                <div class="option" data-value="Twist"><span>With a twist</span></div>
-                <div class="option" data-value="Moral Message"><span>With a moral message</span></div>
-                <div class="option" data-value="Celebration"><span>With a celebration</span></div>
-                <div class="option" data-value="Cliffhanger"><span>With a cliffhanger for a sequel</span></div>
-                <div class="option" data-value="Happily Ever After"><span>With everyone living happily ever after</span></div>
-            </div>
-        </div>
-        <br>
-        <div class="navigation">
-            <button type="button" onclick="prevQuestion()">Back</button>
-            <button type="button" onclick="nextQuestion()" id="nextButton">Next</button>
-            <button type="button" onclick="submitForm()" style="display: none;" id="submitButton">Submit</button>
         </div>
     </div>
-    <script src="/static/script.js"></script>
-</body>
-</html>
+</div>
+<script src="/static/script.js"></script>
+{% endblock %}

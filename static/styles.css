@@ -1,16 +1,49 @@
+/* General styles */
 body {
     display: flex;
-    font-family: Arial, sans-serif;
+    flex-direction: column;
+    min-height: 100vh; /* Make sure the body covers the full viewport height */
+    margin: 0;
 }
 
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.active {
+    display: block; /* Show active question */
+}
+
+.footer {
+    flex-shrink: 0; /* Prevent footer from shrinking */
+    /* Footer styles */
+}
+.title {
+    font-size: 60px;
+}
+
+/* Nav bar */
+.custom-navbar {
+    display: flex;
+    justify-content: center;
+}
+
+/* Side bar */
 .sidebar {
+    float: left; /* Float the sidebar to the left */
     width: 20%;
     background-color: #f4f4f4;
     padding: 20px;
     height: 100vh;
 }
 
+/* Main content */
 .content {
+    margin-top: 40px; /* Adjust the margin to avoid overlapping with the navbar */
+    height: 100vh;
     flex: 1;
     text-align: center;
     padding: 20px;
@@ -19,9 +52,36 @@ body {
     align-items: center;
 }
 
+.start-over {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #ff4d4d; /* Red color for clear visibility */
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #4CAF50;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+    margin-top: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Questions and Options */
 .options {
     display: flex;
-    justify-content: center;
+    justify-content: left;
     flex-wrap: wrap;
     gap: 20px;
 }
@@ -59,45 +119,6 @@ body {
     transform: scale(1.05); /* Slight scale on hover for interactivity */
 }
 
-.start-over {
-    margin-bottom: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #ff4d4d; /* Red color for clear visibility */
-    color: white;
-    border: none;
-    border-radius: 5px;
-}
-
-
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 8px;
-}
-
-@media (max-width: 600px) {
-    .sidebar {
-        width: 100%;
-        height: auto;
-        display: none;
-    }
-
-    .content {
-        margin: 0;
-    }
-
-    .options {
-        flex-direction: column;
-    }
-
-    .option {
-        margin-bottom: 10px;
-    }
-}
-
 .question {
     display: none; /* Hide all questions by default */
 }
@@ -106,17 +127,72 @@ button {
     display: block; /* Only show the active question */
 }
 
-.container {
-    width: 80%;
+/* Pages */
+.bookContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
     margin: auto;
     padding: 20px;
     text-align: center;
 }
 
-.story-content {
-    text-align: left;
-    background-color: #f0f0f0;
-    border-radius: 10px;
-    padding: 20px;
-    margin-top: 20px;
+.page {
+    margin: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    width: 100%;
+}
+.page img {
+    max-width: 100%;
+    max-height: 100%;
+    overflow: hidden;
+}
+
+.text {
+    padding: 15px;
+    text-align: center;
+    flex-grow: 1;
+}
+
+/* Adjustments to the navigation buttons */
+.navigation {
+    text-align: center; /* Center align the navigation buttons */
+    margin-top: 20px; /* Add some space between questions and navigation */
+}
+
+.navigation button {
+    margin: 5px; /* Add margin to space out the buttons */
+}
+
+/* Media changing styles */
+@media (max-width: 768px) {
+    .custom-navbar {
+        display: flex;
+        justify-content: left;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        display: none;
+    }
+
+    .options {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* Two columns */
+        gap: 10px; /* Spacing between grid items */
+        justify-content: center; /* Center items horizontally */
+        align-items: center; /* Center items vertically */
+    }
+
+    /* Adjustments for individual option items */
+    .option {
+        width: auto; /* Allow items to adjust their width */
+        margin-bottom: 0; /* Remove bottom margin */
+    }
+    .page {
+        width: 100%;
+    }
 }
